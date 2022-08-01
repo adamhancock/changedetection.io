@@ -1,7 +1,4 @@
 pipeline {
-    agent {
-        kubernetes
-    }
     stages {
         stage('Test') {
             steps {
