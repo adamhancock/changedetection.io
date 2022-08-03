@@ -1,21 +1,55 @@
-podTemplate(containers: [
-    containerTemplate(
-        name: 'python',
-        image: 'python:latest',
-        command: 'sleep',
-        args: '30d')
-  ]) {
+#!groovy
 
-    node(POD_LABEL) {
-        stage('Get a Python Project') {
-            git url: 'https://github.com/adamhancock/changedetection.io.git', branch: 'master'
-            container('python') {
-                stage('Build a Go project') {
-                    sh '''
-                    echo "Go Build"
-                    '''
-                }
+def podLabel = "kaniko-${UUID.randomUUID().toString()}"
+
+pipeline {
+    agent {
+        kubernetes {
+            label podLabel
+            defaultContainer 'jnlp'
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins-build: app-build
+    some-label: "build-app-${BUILD_NUMBER}"
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:v1.5.1-debug
+    imagePullPolicy: IfNotPresent
+    command:
+    - /busybox/cat
+    tty: true
+"""
+        }
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+              checkout scm
             }
+        }
+
+        stage('Build with Kaniko') {
+          steps {
+            container(name: 'kaniko', shell: '/busybox/sh') {
+              withEnv(['PATH+EXTRA=/busybox']) {
+                sh '''#!/busybox/sh -xe
+                  /kaniko/executor \
+                    --dockerfile Dockerfile \
+                    --context `pwd`/ \
+                    --verbosity debug \
+                    --insecure \
+                    --skip-tls-verify \
+                    --destination registry.home.a9k.io/changedetection:latest
+                '''
+              }
+            }
+          }
         }
 
     }
