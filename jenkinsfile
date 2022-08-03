@@ -47,7 +47,7 @@ spec:
                     --verbosity debug \
                     --insecure \
                     --skip-tls-verify \
-                    --destination ${registry}/${image}:latest
+                    --destination ${registry}/${image}:latest \
                     --destination ${registry}/${image}:${BUILD_NUMBER}
                 """
               }
