@@ -45,7 +45,7 @@ spec:
                     --verbosity debug \
                     --insecure \
                     --skip-tls-verify \
-                    --destination registry.home.a9k.io/changedetection:latest
+                    --destination registry.default.svc.cluster.local/changedetection:latest
                 '''
               }
             }
