@@ -45,7 +45,7 @@ spec:
                     --verbosity debug \
                     --insecure \
                     --skip-tls-verify \
-                    --destination registry.default.svc.cluster.local/changedetection:latest
+                    --destination registry.default.svc.cluster.local:5000/changedetection:latest
                 '''
               }
             }
